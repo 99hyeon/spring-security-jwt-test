@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:jwt_template;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+jwt:
+  # 운영에서는 환경변수로 넣는 것을 권장합니다.
+  secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_AT_LEAST_32_BYTES"
+  issuer: "jwt-template"
+  access-ttl-seconds: 900       # 15분
+  refresh-ttl-seconds: 1209600  # 14일
+
+security:
+  cors:
+    allowed-origins: "http://localhost:3000"
+  cookie:
+    refresh-name: "refresh_token"
+    # 로컬 HTTP에서는 false, 운영 HTTPS에서는 true 권장
+    secure: false
+    same-site: "Lax"   # cross-site 필요하면 None (Secure=true 필요)
+    path: "/api/auth"

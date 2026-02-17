@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+jwt:
+  secret: "TEST_TEST_TEST_TEST_TEST_TEST_TEST_TEST_32_BYTES"
+  issuer: "jwt-template-test"
+  access-ttl-seconds: 120
+  refresh-ttl-seconds: 600
+
+security:
+  cors:
+    allowed-origins: "http://localhost:3000"
+  cookie:
+    refresh-name: "refresh_token"
+    secure: false
+    same-site: "Lax"
+    path: "/api/auth"
