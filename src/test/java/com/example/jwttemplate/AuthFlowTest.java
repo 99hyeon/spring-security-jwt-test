@@ -2,6 +2,7 @@ package com.example.jwttemplate;
 
 import com.example.jwttemplate.refreshtoken.RefreshTokenRepository;
 import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,10 +25,15 @@ class AuthFlowTest {
     RefreshTokenRepository refreshTokenRepository;
 
     @Test
+    @DisplayName("로그인 성공 시: Authorization 헤더(access) + Set-Cookie(refresh)가 내려온다")
     void login_sets_refresh_cookie_and_access_header() throws Exception {
+        //given
+        String loginBody = "{\"email\":\"user@example.com\",\"password\":\"password1234\"}";
+
+        //when & then
         MvcResult result = mvc.perform(post("/api/auth/login")
                 .contentType("application/json")
-                .content("{\"email\":\"user@example.com\",\"password\":\"password1234\"}"))
+                .content(loginBody))
             .andExpect(status().isOk())
             .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
             .andExpect(header().string(HttpHeaders.SET_COOKIE,
@@ -39,17 +45,23 @@ class AuthFlowTest {
     }
 
     @Test
+    @DisplayName("인증 없이 보호 API 호출하면: 접근이 거부된다(기본 설정 기준 403)")
     void protected_endpoint_requires_access_token() throws Exception {
+        //when & then
         mvc.perform(get("/api/me"))
-            .andExpect(
-                status().isForbidden()); // Spring Security default: 403 when unauthenticated and no entry point customized
+            .andExpect(status().isForbidden());
     }
 
     @Test
+    @DisplayName("Access Token이 있으면: 보호 API(/api/me)에 접근할 수 있다")
     void access_token_allows_protected_endpoint() throws Exception {
+        //given
+        String loginBody = "{\"email\":\"user@example.com\",\"password\":\"password1234\"}";
+
+        //when & then
         MvcResult login = mvc.perform(post("/api/auth/login")
                 .contentType("application/json")
-                .content("{\"email\":\"user@example.com\",\"password\":\"password1234\"}"))
+                .content(loginBody))
             .andExpect(status().isOk())
             .andReturn();
 
@@ -62,18 +74,21 @@ class AuthFlowTest {
     }
 
     @Test
+    @DisplayName("Refresh Token으로 재발급하면: 새 Access/Refresh가 발급되고 Refresh는 로테이션된다")
     void refresh_rotates_tokens() throws Exception {
+        //given
+        String loginBody = "{\"email\":\"user@example.com\",\"password\":\"password1234\"}";
+
+        //when & then
         MvcResult login = mvc.perform(post("/api/auth/login")
                 .contentType("application/json")
-                .content("{\"email\":\"user@example.com\",\"password\":\"password1234\"}"))
+                .content(loginBody))
             .andExpect(status().isOk())
             .andReturn();
-
         String setCookie = login.getResponse().getHeader(HttpHeaders.SET_COOKIE);
         assertThat(setCookie).contains("refresh_token=");
 
         Cookie refreshCookie = login.getResponse().getCookie("refresh_token");
-
         MvcResult refreshed = mvc.perform(post("/api/auth/refresh")
                 .cookie(refreshCookie))
             .andExpect(status().isOk())
@@ -87,10 +102,15 @@ class AuthFlowTest {
     }
 
     @Test
+    @DisplayName("로그아웃하면: refresh 쿠키가 삭제(Max-Age=0)된다")
     void logout_clears_cookie() throws Exception {
+        //given
+        String loginBody = "{\"email\":\"user@example.com\",\"password\":\"password1234\"}";
+
+        //when & then
         MvcResult login = mvc.perform(post("/api/auth/login")
                 .contentType("application/json")
-                .content("{\"email\":\"user@example.com\",\"password\":\"password1234\"}"))
+                .content(loginBody))
             .andExpect(status().isOk())
             .andReturn();
 
