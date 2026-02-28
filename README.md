@@ -120,3 +120,5 @@ fork한 사람은 설치 없이 바로 `./gradlew` 실행이 가능합니다.
 
 ## License
 MIT
+
+![Last commit (main)](https://img.shields.io/github/last-commit/99hyeon/spring-security-jwt-test/main?display_timestamp=committer)
