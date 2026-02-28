@@ -75,6 +75,7 @@ public class AuthService {
 
         // Rotate refresh
         stored.revoke();
+        refreshTokenRepository.save(stored);
 
         String newRefresh = tokenProvider.createRefreshToken(userId);
         persistRefresh(userId, newRefresh);

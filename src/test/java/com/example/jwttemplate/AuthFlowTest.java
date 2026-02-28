@@ -1,6 +1,7 @@
 package com.example.jwttemplate;
 
 import com.example.jwttemplate.refreshtoken.RefreshTokenRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,8 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AuthFlowTest {
 
-    @Autowired MockMvc mvc;
-    @Autowired RefreshTokenRepository refreshTokenRepository;
+    @Autowired
+    MockMvc mvc;
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
 
     @Test
     void login_sets_refresh_cookie_and_access_header() throws Exception {
@@ -27,7 +30,8 @@ class AuthFlowTest {
                 .content("{\"email\":\"user@example.com\",\"password\":\"password1234\"}"))
             .andExpect(status().isOk())
             .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
-            .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("refresh_token=")))
+            .andExpect(header().string(HttpHeaders.SET_COOKIE,
+                org.hamcrest.Matchers.containsString("refresh_token=")))
             .andReturn();
 
         assertThat(result.getResponse().getHeader(HttpHeaders.AUTHORIZATION)).startsWith("Bearer ");
@@ -37,7 +41,8 @@ class AuthFlowTest {
     @Test
     void protected_endpoint_requires_access_token() throws Exception {
         mvc.perform(get("/api/me"))
-            .andExpect(status().isForbidden()); // Spring Security default: 403 when unauthenticated and no entry point customized
+            .andExpect(
+                status().isForbidden()); // Spring Security default: 403 when unauthenticated and no entry point customized
     }
 
     @Test
@@ -67,11 +72,14 @@ class AuthFlowTest {
         String setCookie = login.getResponse().getHeader(HttpHeaders.SET_COOKIE);
         assertThat(setCookie).contains("refresh_token=");
 
+        Cookie refreshCookie = login.getResponse().getCookie("refresh_token");
+
         MvcResult refreshed = mvc.perform(post("/api/auth/refresh")
-                .header(HttpHeaders.COOKIE, setCookie))
+                .cookie(refreshCookie))
             .andExpect(status().isOk())
             .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
-            .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("refresh_token=")))
+            .andExpect(header().string(HttpHeaders.SET_COOKIE,
+                org.hamcrest.Matchers.containsString("refresh_token=")))
             .andReturn();
 
         String newSetCookie = refreshed.getResponse().getHeader(HttpHeaders.SET_COOKIE);
@@ -86,10 +94,11 @@ class AuthFlowTest {
             .andExpect(status().isOk())
             .andReturn();
 
-        String setCookie = login.getResponse().getHeader(HttpHeaders.SET_COOKIE);
+        Cookie refreshCookie = login.getResponse().getCookie("refresh_token");
 
-        mvc.perform(post("/api/auth/logout").header(HttpHeaders.COOKIE, setCookie))
+        mvc.perform(post("/api/auth/logout").cookie(refreshCookie))
             .andExpect(status().isOk())
-            .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("Max-Age=0")));
+            .andExpect(header().string(HttpHeaders.SET_COOKIE,
+                org.hamcrest.Matchers.containsString("Max-Age=0")));
     }
 }

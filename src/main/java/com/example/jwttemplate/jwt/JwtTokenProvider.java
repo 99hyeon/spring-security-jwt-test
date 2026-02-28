@@ -5,6 +5,7 @@ import com.example.jwttemplate.user.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +31,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
             .issuer(props.issuer())
             .subject(String.valueOf(userId))
+            .id(UUID.randomUUID().toString())
             .claim("typ", JwtTokenType.ACCESS.name())
             .claim("email", email)
             .claim("role", role.name())
@@ -46,6 +48,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
             .issuer(props.issuer())
             .subject(String.valueOf(userId))
+            .id(UUID.randomUUID().toString())
             .claim("typ", JwtTokenType.REFRESH.name())
             .issuedAt(Date.from(now))
             .expiration(Date.from(exp))
