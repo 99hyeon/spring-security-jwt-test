@@ -22,7 +22,7 @@
   - [3) Refresh (Re-issue)](#3-refresh-re-issue)
   - [4) Logout](#4-logout)
 - [Customization Points](#customization-points)
-- [Gradle Wrapper](#gradle-wrapper)
+<!-- - [Gradle Wrapper](#gradle-wrapper) -->
 - [Testing](#testing)
 - [License](#license)
 
