@@ -9,6 +9,7 @@
 ## Table of Contents
 - [Overview](#overview)
 - [Key Features](#key-features)
+- [Tech Stack & Requirements](#tech-stack--requirements)
 - [Endpoints](#endpoints)
 - [Quick Start](#quick-start)
   - [1) Use this template / Fork](#1-use-this-template--fork)
@@ -21,7 +22,7 @@
   - [3) Refresh (Re-issue)](#3-refresh-re-issue)
   - [4) Logout](#4-logout)
 - [Customization Points](#customization-points)
-- [Gradle Wrapper 포함 권장](#gradle-wrapper-포함-권장-최초-1회만)
+- [Gradle Wrapper](#gradle-wrapper)
 - [Testing](#testing)
 - [License](#license)
 
@@ -46,11 +47,21 @@ Spring Security + JWT 기반의 **Stateless 인증/인가 템플릿**입니다.
 - ✅ Refresh **Cookie 기반**
 - ✅ Refresh **로테이션(재발급 시 갱신)** 흐름
 - ✅ 로그아웃 시
-  - 서버 저장 Refresh 토큰 폐기
+  - 서버 저장 Refresh 토큰 폐기(soft delete)
   - 클라이언트 쿠키 `Max-Age=0`로 삭제 지시
 - ✅ 샘플 보호 API 제공
   - 로그인 필요: `/api/me`
   - ADMIN 권한 필요: `/api/admin/ping`
+
+---
+
+## Tech Stack & Requirements
+
+- **Java**: 21
+- **Spring Boot**: 3.3.5
+- **Gradle Wrapper**: 8.10.2 (레포에 포함)
+- **DB (기본)**: H2 in-memory (`jdbc:h2:mem:...`, MySQL mode)
+- **JWT**: JJWT 0.12.6
 
 ---
 
@@ -73,8 +84,8 @@ Spring Security + JWT 기반의 **Stateless 인증/인가 템플릿**입니다.
 3. (권장) 패키지명 변경  
    - `com.example.jwttemplate` → `your.package`
 
-#### Local clone (Git Bash)
-원하는 폴더로 이동 후:
+#### 1-1) Local clone (Git Bash)
+“내 컴퓨터에서 어디에 둘지” 폴더 이동
 
 ```bash
 cd ~/Desktop/opensource
@@ -188,7 +199,8 @@ curl -i -X POST "http://localhost:8080/api/auth/logout" \
 
 ---
 
-## Gradle Wrapper 포함 권장 (최초 1회만)
+<!--
+## Gradle Wrapper
 템플릿 레포를 “진짜 템플릿”로 배포하려면 wrapper를 꼭 커밋하세요.
 
 ```bash
@@ -199,6 +211,7 @@ gradle wrapper --gradle-version 8.10.2
 fork한 사람은 설치 없이 바로 `./gradlew` 실행이 가능합니다.
 
 ---
+-->
 
 ## Testing
 MockMvc 기반 인증 플로우 테스트 포함.
