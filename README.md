@@ -79,6 +79,8 @@ Spring Security + JWT 기반의 **Stateless 인증/인가 템플릿**입니다.
 ## Quick Start
 
 ### 1) Use this template / Fork
+<img width="332" height="38" alt="image" src="https://github.com/user-attachments/assets/7008662c-5389-439a-8a2f-1fb69c6e84c6" />
+
 1. GitHub에서 **Use this template** 또는 Fork
 2. 프로젝트 이름/설명 변경
 3. (권장) 패키지명 변경  
